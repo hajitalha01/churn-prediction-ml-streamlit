@@ -117,16 +117,19 @@ if st.button("🔍 Predict"):
     elif model_choice == "Random Forest":
         pred = rf_model.predict(scaled_input)[0]
         prob = rf_model.predict_proba(scaled_input)[0]
-    else:
-        pred = (ann_model.predict(scaled_input) > 0.5).astype(int)[0][0]
-        prob_ann_val = ann_model.predict(scaled_input)[0][0]
-        prob = [1 - prob_ann_val, prob_ann_val]
+    else:  # ANN
+        pred_prob = ann_model.predict(scaled_input)[0][0]
+        pred = int(pred_prob > 0.5)
+        prob = [1 - pred_prob, pred_prob]
 
-    # Display
+    # Display prediction
     st.subheader("🧠 Prediction Result")
-    result_text = "Churn ⚠️" if pred==1 else "No Churn ✅"
-    st.success(result_text) if pred==0 else st.error(result_text)
+    if pred == 0:
+        st.success("No Churn ✅")
+    else:
+        st.error("Churn ⚠️")
 
+    # Display probabilities
     st.subheader("📈 Prediction Probability")
     st.write(f"No Churn : {prob[0]:.2%}")
     st.write(f"Churn    : {prob[1]:.2%}")
